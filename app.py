@@ -16,11 +16,17 @@ DEFAULT_STYLE_ID = 'Styleimg'
 DEFAULT_STYLE_PATH = 'style/Styleimg.pdf'
 DEFAULT_STYLE_OUTPUT = f'static/outputs/{DEFAULT_STYLE_ID}'
 
-if not os.path.exists(DEFAULT_STYLE_OUTPUT) or not os.listdir(DEFAULT_STYLE_OUTPUT):
+def should_generate_default():
+    if not os.path.exists(DEFAULT_STYLE_OUTPUT):
+        return True
+    pngs = [f for f in os.listdir(DEFAULT_STYLE_OUTPUT) if f.endswith('.png')]
+    return len(pngs) == 0
+
+if should_generate_default():
     print("기본 손글씨 스타일 추론 중...")
     processor = FontStyleProcessor(DEFAULT_STYLE_PATH)
     processor.run_all('가')
-    # 기본 sample 이미지 생성은 run_all 내에 포함되어 있음
+
 
 @app.before_request
 def load_session_fonts():
