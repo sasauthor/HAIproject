@@ -16,7 +16,7 @@ session_fonts = {}
 
 # ✅ 서버 시작 시 기본 손글씨 스타일 추론
 DEFAULT_STYLE_ID = 'Styleimg'
-DEFAULT_STYLE_PATH = 'style/styleimg.pdf'
+DEFAULT_STYLE_PATH = 'style/Styleimg.pdf'
 DEFAULT_STYLE_OUTPUT = f'static/outputs/{DEFAULT_STYLE_ID}'
 
 if not os.path.exists(DEFAULT_STYLE_OUTPUT) or not os.listdir(DEFAULT_STYLE_OUTPUT):
