@@ -19,11 +19,11 @@ class FontStyleProcessor:
         os.makedirs(self.output_dir, exist_ok=True)
 
     def convert_pdf_to_images(self):
-    images = convert_from_path(self.pdf_path, dpi=300)
-    for i, img in enumerate(images):
-        fname = f"{self.output_dir}/{self.base_name}_p{i+1}.png" if len(images) > 1 else f"{self.output_dir}/{self.base_name}.png"
-        img.save(fname, dpi=(300, 300))  
-        print(f"[SAVE] {fname}")
+        images = convert_from_path(self.pdf_path, dpi=300)
+        for i, img in enumerate(images):
+            fname = f"{self.output_dir}/{self.base_name}_p{i+1}.png" if len(images) > 1 else f"{self.output_dir}/{self.base_name}.png"
+            img.save(fname, dpi=(300, 300))  
+            print(f"[SAVE] {fname}")
 
 
     def trim_and_save_images(self):
