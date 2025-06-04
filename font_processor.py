@@ -18,7 +18,7 @@ class FontStyleProcessor:
         self.save_dir = f"static/outputs/{self.base_name}"
         os.makedirs(self.output_dir, exist_ok=True)
 
-        def convert_pdf_to_images(self):
+    def convert_pdf_to_images(self):
         images = convert_from_path(self.pdf_path, dpi=300)
         for i, img in enumerate(images):
             fname = f"{self.output_dir}/{self.base_name}_p{i+1}.png" if len(images) > 1 else f"{self.output_dir}/{self.base_name}.png"
