@@ -9,6 +9,7 @@ app.secret_key = 'hai-secret-key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 session_fonts = {}
 
 DEFAULT_STYLE_ID = 'Styleimg'
@@ -18,15 +19,16 @@ DEFAULT_STYLE_OUTPUT = f'static/outputs/{DEFAULT_STYLE_ID}'
 if not os.path.exists(DEFAULT_STYLE_OUTPUT) or not os.listdir(DEFAULT_STYLE_OUTPUT):
     print("기본 손글씨 스타일 추론 중...")
     processor = FontStyleProcessor(DEFAULT_STYLE_PATH)
-    processor.run_all('가')
-    processor.generate_sample_image()
+    processor.run_all('가')  # 초기 글자
+    # 기본 sample.png 생성은 run_all 내부에서 처리됨
 
 @app.before_request
 def load_session_fonts():
     session_id = session.get('id')
     if not session_id:
-        session_id = str(uuid.uuid4())
-        session['id'] = session_id
+        session['id'] = str(uuid.uuid4())
+        session_id = session['id']
+        session_fonts[session_id] = [DEFAULT_STYLE_ID]
     if session_id not in session_fonts:
         session_fonts[session_id] = [DEFAULT_STYLE_ID]
 
@@ -50,7 +52,6 @@ def upload():
     style_id = os.path.splitext(filename)[0]
     processor = FontStyleProcessor(filepath)
     processor.run_all('가')
-    processor.generate_sample_image()
 
     session_fonts[session['id']].append(style_id)
     return jsonify({'status': 'success'})
@@ -69,15 +70,11 @@ def generate():
     processor.generate_yaml(text)
     processor.run_inference()
 
+    image_dir = f'static/outputs/{style_id}'
     image_files = [
-        f"/static/outputs/{style_id}/{f}"
-        for f in os.listdir(f'static/outputs/{style_id}') if f.endswith('.png')
+        f"/static/outputs/{style_id}/{f}?t={int(uuid.uuid4().int>>64)}"
+        for f in os.listdir(image_dir) if f.endswith('.png')
     ]
     return jsonify({'images': image_files})
 
-@app.route('/download-template')
-def download_template():
-    return send_from_directory(directory='.', path='28_template.pdf', as_attachment=True)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000, debug=True)
+# 나머지 라우트 및 실행부 동일...
