@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAI! 손글씨 AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function selectTemplate(id) {
+      document.getElementById("selected-style-id").value = id;
+      console.log("선택된 템플릿 ID:", id);
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      const input = document.getElementById("text-input").value.trim();
+      const styleId = document.getElementById("selected-style-id").value;
+
+      if (!input || !styleId) {
+        alert("문구를 입력하고 글씨체를 선택해주세요!");
+        return;
+      }
+
+      const chat = document.getElementById("chat-history");
+
+      // 사용자 입력 채팅 추가
+      chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end">${input}</div>`;
+
+      // 로딩 메시지 표시
+      const loaderId = "loading-msg-" + Date.now();
+      chat.innerHTML += `<div id="${loaderId}" class="bg-gray-200 p-2 my-2 rounded shadow w-fit italic text-gray-600">[...] 이미지 생성 중...</div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      // 서버 요청
+      const res = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input, style_id: styleId })
+      });
+
+      const data = await res.json();
+
+      // 로딩 메시지 제거
+      const loadingMsg = document.getElementById(loaderId);
+      if (loadingMsg) loadingMsg.remove();
+
+      // 결과 이미지 출력
+      if (data.images) {
+        const images = data.images.map(url =>
+          `<div class="mt-2">
+            <img src="${url}" class="rounded shadow w-48" />
+            <a href="${url}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
+          </div>`).join('');
+
+        chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${images}</div>`;
+      } else {
+        chat.innerHTML += `<div class="bg-red-100 p-2 my-2 rounded shadow w-fit">⚠️ 오류가 발생했어요!</div>`;
+      }
+
+      document.getElementById("text-input").value = "";
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function uploadFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.example_html) {
+        document.getElementById("examples-grid").innerHTML += data.example_html;
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100">
+  <div class="max-w-3xl mx-auto py-6 px-4">
+    <h1 class="text-4xl font-bold mb-6 text-center">HAI! 손글씨 AI</h1>
+
+    <!-- 설명 말풍선 -->
+    <div class="bg-blue-100 text-blue-900 p-4 rounded-lg mb-4 shadow text-sm space-y-1">
+      <p>안녕하세요! 저는 손글씨 AI HAI에요!</p>
+      <p>1. '➕'를 눌러서 내 손글씨를 등록해 보세요! </p>
+      <p>2. 등록된 손글씨 중에 원하는 걸 선택해주세요!</p>
+      <p>3. 원하는 문구를 채팅으로 저에게 보내주세요!</p>
+      <p>그러면 HAI가 예쁜 손글씨로 쓰여진 문구를 보내드립니다!</p>
+    </div>
+
+    <!-- 채팅 UI 박스 -->
+    <div id="chat-history" class="flex flex-col bg-white h-[450px] overflow-y-scroll p-4 rounded shadow mb-4"></div>
+
+    <!-- 입력 폼 -->
+    <form class="flex items-center space-x-2" onsubmit="handleSubmit(event)">
+      <!-- 파일 업로드 버튼 -->
+      <label for="file-upload" class="cursor-pointer">
+        <span class="text-2xl">➕</span>
+      </label>
+      <input id="file-upload" type="file" class="hidden" name="file" onchange="uploadFile(event)" />
+
+      <!-- 문구 입력창 -->
+      <input id="text-input" type="text" name="text" placeholder="문구 입력칸"
+        class="flex-grow border border-gray-300 rounded px-4 py-2" />
+
+      <!-- 제출 버튼 -->
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <span class="text-xl">⬆️</span>
+      </button>
+      <input type="hidden" id="selected-style-id" value="">
+    </form>
+
+    <!-- 저장된 글씨체 예시 -->
+    <h2 class="text-xl font-semibold mt-8 mb-4">저장된 글씨체 예시</h2>
+    <div id="examples-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {% for example in examples %}
+      <div onclick="selectTemplate('{{ example.id }}')" class="cursor-pointer hover:scale-105 transition">
+        <img src="{{ url_for('static', filename=example.image) }}" alt="예시 {{ loop.index }}"
+          class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
+        <p class="text-center text-sm mt-1">예시 {{ loop.index }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+
+</html>
