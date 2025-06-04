@@ -10,7 +10,7 @@ class FontStyleProcessor:
     def __init__(self, pdf_path):
         self.pdf_path = pdf_path
         self.base_name = os.path.splitext(os.path.basename(pdf_path))[0]
-        self.output_dir = f"style/{self.base_name}"
+        self.output_dir = "style"
         self.cropped_dir = os.path.join(self.output_dir, "cropped")
         self.cleaned_dir = os.path.join(self.output_dir, "cleaned")
         self.yaml_path = f"configs/{self.base_name}.yaml"
