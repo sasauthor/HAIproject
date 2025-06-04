@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from font_processor import FontStyleProcessor
 import os
 import uuid
+import random
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'hai-secret-key'
@@ -35,7 +36,8 @@ def index():
     session_id = session['id']
     examples = [{'id': fid, 'image': f'{fid}/sample.png'} for fid in session_fonts[session_id]]
     selected_style = session_fonts[session_id][0]
-    return render_template('index.html', examples=examples, selected_style=selected_style)
+    rand_num = random.random()
+    return render_template('index.html', examples=examples, selected_style=selected_style, rand_num=rand_num)
 
 @app.route('/upload', methods=['POST'])
 def upload():
