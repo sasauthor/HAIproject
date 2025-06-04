@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from font_processor import FontStyleProcessor
 import os, uuid
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = 'hai-secret-key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
