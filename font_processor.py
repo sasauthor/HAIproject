@@ -25,7 +25,6 @@ class FontStyleProcessor:
             img.save(fname, dpi=(300, 300))  
             print(f"[SAVE] {fname}")
 
-
     def trim_and_save_images(self):
         def trim_whitespace(path):
             img = Image.open(path)
@@ -35,9 +34,11 @@ class FontStyleProcessor:
             if bbox:
                 img = img.crop(bbox)
                 img.save(path)
+
         for fname in os.listdir(self.output_dir):
-            if fname.endswith((".png", ".jpg", ".jpeg")):
+            if fname.lower().endswith((".png", ".jpg", ".jpeg")):
                 trim_whitespace(os.path.join(self.output_dir, fname))
+
         subprocess.run([
             "python", "style/crop.py",
             f"--src_dir={self.output_dir}",
@@ -76,6 +77,16 @@ class FontStyleProcessor:
 
     def run_inference(self):
         inference_main(self.yaml_path, self.checkpoint, self.save_dir)
+
+    def generate_sample_image(self):
+        sample_text = '가나다'
+        self.generate_yaml(sample_text)
+        self.run_inference()
+        output_images = [f for f in os.listdir(self.save_dir) if f.endswith('.png')]
+        if output_images:
+            first_image = os.path.join(self.save_dir, output_images[0])
+            sample_image_path = os.path.join(self.save_dir, 'sample.png')
+            Image.open(first_image).save(sample_image_path)
 
     def run_all(self, target_chars):
         self.convert_pdf_to_images()
