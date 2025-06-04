@@ -36,7 +36,7 @@ class FontStyleProcessor:
                 img = img.crop(bbox)
                 img.save(path)
         for fname in os.listdir(self.output_dir):
-            if fname.endswith(".png", ".jpg", ".jpeg"):
+            if fname.endswith((".png", ".jpg", ".jpeg")):
                 trim_whitespace(os.path.join(self.output_dir, fname))
         subprocess.run([
             "python", "style/crop.py",
