@@ -24,15 +24,12 @@
 
       const chat = document.getElementById("chat-history");
 
-      // 사용자 입력 채팅 추가
       chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end">${input}</div>`;
 
-      // 로딩 메시지 표시
       const loaderId = "loading-msg-" + Date.now();
       chat.innerHTML += `<div id="${loaderId}" class="bg-gray-200 p-2 my-2 rounded shadow w-fit italic text-gray-600">[...] 이미지 생성 중...</div>`;
       chat.scrollTop = chat.scrollHeight;
 
-      // 서버 요청
       const res = await fetch('/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,11 +38,9 @@
 
       const data = await res.json();
 
-      // 로딩 메시지 제거
       const loadingMsg = document.getElementById(loaderId);
       if (loadingMsg) loadingMsg.remove();
 
-      // 결과 이미지 출력
       if (data.images) {
         const images = data.images.map(url =>
           `<div class="mt-2">
@@ -89,10 +84,19 @@
     <!-- 설명 말풍선 -->
     <div class="bg-blue-100 text-blue-900 p-4 rounded-lg mb-4 shadow text-sm space-y-1">
       <p>안녕하세요! 저는 손글씨 AI HAI에요!</p>
-      <p>1. '➕'를 눌러서 내 손글씨를 등록해 보세요! </p>
+      <p>1. <strong>'➕'</strong>를 눌러서 내 손글씨를 등록해 보세요!</p>
       <p>2. 등록된 손글씨 중에 원하는 걸 선택해주세요!</p>
       <p>3. 원하는 문구를 채팅으로 저에게 보내주세요!</p>
       <p>그러면 HAI가 예쁜 손글씨로 쓰여진 문구를 보내드립니다!</p>
+
+      <!-- 템플릿 다운로드 버튼 -->
+      <div class="mt-4">
+        <a href="{{ url_for('static', filename='28_template.pdf') }}"
+           class="bg-white border border-blue-500 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 shadow inline-block text-sm"
+           download>
+          📄 손글씨 템플릿 다운로드
+        </a>
+      </div>
     </div>
 
     <!-- 채팅 UI 박스 -->
