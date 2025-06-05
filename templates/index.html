@@ -1,127 +1,124 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HAI! 손글씨 AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    function selectTemplate(id) {
-      document.getElementById("selected-style-id").value = id;
-      console.log("선택된 템플릿 ID:", id);
-    }
-
-    async function handleSubmit(event) {
-      event.preventDefault();
-      const input = document.getElementById("text-input").value.trim();
-      const styleId = document.getElementById("selected-style-id").value;
-
-      if (!input || !styleId) {
-        alert("문구를 입력하고 글씨체를 선택해주세요!");
-        return;
-      }
-
-      const chat = document.getElementById("chat-history");
-
-      chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end">${input}</div>`;
-
-      const loaderId = "loading-msg-" + Date.now();
-      chat.innerHTML += `<div id="${loaderId}" class="bg-gray-200 p-2 my-2 rounded shadow w-fit italic text-gray-600">[...] 이미지 생성 중...</div>`;
-      chat.scrollTop = chat.scrollHeight;
-
-      const res = await fetch('/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: input, style_id: styleId })
-      });
-
-      const data = await res.json();
-
-      const loadingMsg = document.getElementById(loaderId);
-      if (loadingMsg) loadingMsg.remove();
-
-      if (data.images) {
-        const images = data.images.map(url =>
-          `<div class="mt-2">
-            <img src="${url}" class="rounded shadow w-48" />
-            <a href="${url}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
-          </div>`).join('');
-
-        chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${images}</div>`;
-      } else {
-        chat.innerHTML += `<div class="bg-red-100 p-2 my-2 rounded shadow w-fit">⚠️ 오류가 발생했어요!</div>`;
-      }
-
-      document.getElementById("text-input").value = "";
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    async function uploadFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await res.json();
-      if (data.example_html) {
-        document.getElementById("examples-grid").innerHTML += data.example_html;
-      }
-    }
-  </script>
+    <meta charset="UTF-8" />
+    <title>손글씨 스타일 변환</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-<body class="bg-gray-100">
-  <div class="max-w-3xl mx-auto py-6 px-4">
-    <h1 class="text-4xl font-bold mb-6 text-center">HAI! 손글씨 AI</h1>
+<div class="w-full max-w-4xl">
+    <h1 class="text-2xl font-bold mb-4 text-center">손글씨 스타일 변환</h1>
 
-    <div class="bg-blue-100 text-blue-900 p-4 rounded-lg mb-4 shadow text-sm space-y-1">
-      <p>안녕하세요! 저는 손글씨 AI HAI에요!</p>
-      <p>1. <strong>'➕'</strong>를 눌러서 내 손글씨를 등록해 보세요!</p>
-      <p>2. 등록된 손글씨 중에 원하는 걸 선택해주세요!</p>
-      <p>3. 원하는 문구를 채팅으로 저에게 보내주세요!</p>
-      <p>그러면 HAI가 예쁜 손글씨로 쓰여진 문구를 보내드립니다!</p>
-      <div class="mt-4">
-        <a href="{{ url_for('static', filename='28_template.pdf') }}"
-           class="bg-white border border-blue-500 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 shadow inline-block text-sm"
-           download>
-          📄 손글씨 템플릿 다운로드
-        </a>
-      </div>
+    <!-- 스타일 예시들 -->
+    <div id="examples-grid" class="grid grid-cols-4 gap-4 mb-6">
+        {% for example in examples %}
+        <div onclick="selectTemplate('{{ example.id }}')" class="cursor-pointer hover:scale-105 transition">
+            <img src="/static/outputs/{{ example.id }}/sample.png?t={{ rand_num }}" alt="예시"
+                class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
+            <p class="text-center text-sm mt-1">예시 {{ loop.index }}</p>
+        </div>
+        {% endfor %}
     </div>
 
-    <div id="chat-history" class="flex flex-col bg-white h-[450px] overflow-y-scroll p-4 rounded shadow mb-4"></div>
-
-    <form class="flex items-center space-x-2" onsubmit="handleSubmit(event)">
-      <label for="file-upload" class="cursor-pointer">
-        <span class="text-2xl">➕</span>
-      </label>
-      <input id="file-upload" type="file" class="hidden" name="file" onchange="uploadFile(event)" />
-      <input id="text-input" type="text" name="text" placeholder="문구 입력칸"
-        class="flex-grow border border-gray-300 rounded px-4 py-2" />
-      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-        <span class="text-xl">⬆️</span>
-      </button>
-      <input type="hidden" id="selected-style-id" value="{{ selected_style }}">
+    <form id="generate-form" class="mb-6">
+        <input type="hidden" id="selected-style-id" name="style_id" value="{{ selected_style }}">
+        <textarea id="input-text" name="text" placeholder="변환할 문구를 입력하세요..." rows="4"
+            class="w-full p-2 rounded border border-gray-300 resize-none"></textarea>
+        <button type="submit" class="mt-2 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">변환하기</button>
     </form>
 
-    <h2 class="text-xl font-semibold mt-8 mb-4">저장된 글씨체 예시</h2>
-    <div id="examples-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {% for example in examples %}
-      <div onclick="selectTemplate('{{ example.id }}')" class="cursor-pointer hover:scale-105 transition">
-        <img src="{{ url_for('static', filename=example.image) }}?t={{ rand_num }}" alt="예시 {{ loop.index }}"
-          class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
-        <p class="text-center text-sm mt-1">예시 {{ loop.index }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</body>
+    <form id="upload-form" enctype="multipart/form-data" class="mb-6">
+        <label class="block mb-2 font-semibold">새 손글씨 스타일 업로드 (PDF)</label>
+        <input type="file" id="upload-file" name="file" accept="application/pdf" required />
+        <button type="submit" class="mt-2 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">업로드</button>
+    </form>
 
+    <div id="result" class="grid grid-cols-4 gap-4"></div>
+</div>
+
+<script>
+    const examplesGrid = document.getElementById('examples-grid');
+    const selectedStyleInput = document.getElementById('selected-style-id');
+    const generateForm = document.getElementById('generate-form');
+    const uploadForm = document.getElementById('upload-form');
+    const resultDiv = document.getElementById('result');
+
+    function selectTemplate(id) {
+        selectedStyleInput.value = id;
+        // 선택된 스타일 테두리 강조 UI 갱신
+        Array.from(examplesGrid.children).forEach(div => {
+            div.classList.remove('border-blue-400');
+            div.querySelector('img').classList.remove('border-blue-400');
+            div.querySelector('img').classList.add('border-transparent');
+        });
+        const selectedDiv = Array.from(examplesGrid.children).find(div => div.onclick.toString().includes(id));
+        if(selectedDiv){
+            selectedDiv.querySelector('img').classList.remove('border-transparent');
+            selectedDiv.querySelector('img').classList.add('border-blue-400');
+        }
+    }
+
+    generateForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = document.getElementById('input-text').value.trim();
+        const style_id = selectedStyleInput.value;
+
+        if (!text) {
+            alert("문구를 입력하세요.");
+            return;
+        }
+
+        const res = await fetch('/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text, style_id})
+        });
+
+        const data = await res.json();
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        resultDiv.innerHTML = '';
+        data.images.forEach(src => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = '결과 이미지';
+            img.className = 'rounded-lg shadow';
+            resultDiv.appendChild(img);
+        });
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('upload-file');
+        if (!fileInput.files.length) {
+            alert('PDF 파일을 선택하세요.');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        const res = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        // 새 예시 HTML을 examples-grid에 추가
+        examplesGrid.insertAdjacentHTML('beforeend', data.example_html);
+        // 파일 선택 초기화
+        fileInput.value = '';
+    });
+</script>
+
+</body>
 </html>
