@@ -7,17 +7,24 @@
   <title>HAI! 손글씨 AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    let selectedIndex = 1;
     function selectTemplate(id) {
       document.getElementById("selected-style-id").value = id;
-      document.querySelectorAll("[id^='style-thumb-']").forEach(el => {
-        el.classList.remove("border-blue-500", "ring-2", "ring-blue-300");
-      });
+
+      const thumbs = document.querySelectorAll("[id^='style-thumb-']");
+      thumbs.forEach(el => el.classList.remove("border-blue-500", "ring-2", "ring-blue-300"));
+    
       const target = document.getElementById(`style-thumb-${id}`);
       if (target) {
         target.classList.add("border-blue-500", "ring-2", "ring-blue-300");
       }
-      console.log("선택된 템플릿 ID:", id);
+    
+      const indexMap = [...thumbs].map(el => el.id.split('-')[2]);
+      selectedIndex = indexMap.indexOf(id) + 1;
+    
+      console.log("선택된 템플릿 ID:", id, "예시", selectedIndex,"선택됨.");
     }
+
 
     async function handleSubmit(event) {
       event.preventDefault();
@@ -48,14 +55,14 @@
       if (loadingMsg) loadingMsg.remove();
 
       if (data.images) {
-        const images = data.images.map(url =>
+        let content = `<p class="text-sm font-semibold mb-1">예시 ${selectedIndex}</p>`;
+        content += data.images.map(url =>
           `<div class="mt-2">
             <img src="${url}" class="rounded shadow w-48" />
             <a href="${url}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
           </div>`).join('');
-        chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${images}</div>`;
-      } else {
-        chat.innerHTML += `<div class="bg-red-100 p-2 my-2 rounded shadow w-fit">⚠️ 오류가 발생했어요!</div>`;
+        chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${content}</div>`;
+
       }
 
       document.getElementById("text-input").value = "";
