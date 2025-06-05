@@ -27,7 +27,6 @@ if should_generate_default():
     processor = FontStyleProcessor(DEFAULT_STYLE_PATH)
     processor.run_all('가')
 
-
 @app.before_request
 def load_session_fonts():
     session_id = session.get('id')
@@ -57,26 +56,14 @@ def upload():
     if style_id == DEFAULT_STYLE_ID:
         return jsonify({'error': '기본 스타일 이름(Styleimg)으로는 업로드할 수 없습니다.'}), 400
 
-    session_id = session['id']
-    if style_id in session_fonts.get(session_id, []):
-        return jsonify({'error': '이미 등록된 스타일입니다.'}), 400
-
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
     processor = FontStyleProcessor(filepath)
     processor.run_all('가')
 
-    session_fonts[session_id].append(style_id)
-
-    # 새 스타일 샘플 이미지 경로 포함해서 클라이언트가 UI 업데이트 가능하게 반환
-    example_html = f'''
-    <div onclick="selectTemplate('{style_id}')" class="cursor-pointer hover:scale-105 transition">
-      <img src="/static/outputs/{style_id}/sample.png?t={random.random()}" alt="예시" class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
-      <p class="text-center text-sm mt-1">예시 {len(session_fonts[session_id])}</p>
-    </div>
-    '''
-    return jsonify({'status': 'success', 'example_html': example_html})
+    session_fonts[session['id']].append(style_id)
+    return jsonify({'status': 'success'})
 
 @app.route('/generate', methods=['POST'])
 def generate():
