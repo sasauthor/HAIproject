@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, send_from_directory
+from flask_session import Session 
 from werkzeug.utils import secure_filename
 from font_processor import FontStyleProcessor
 import os
