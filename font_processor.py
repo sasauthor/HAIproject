@@ -39,11 +39,14 @@ class FontStyleProcessor:
             if fname.lower().endswith((".png", ".jpg", ".jpeg")):
                 trim_whitespace(os.path.join(self.output_dir, fname))
 
-        subprocess.run([
-            "python", "style/crop.py",
-            f"--src_dir={self.output_dir}",
-            f"--dst_dir={self.cropped_dir}"
-        ], check=True)
+        try:
+            subprocess.run([
+                "python", "style/crop.py",
+                f"--src_dir={self.output_dir}",
+                f"--dst_dir={self.cropped_dir}"
+            ], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"[ERROR] crop.py 실행 실패: {e}")
 
     def clean_images(self):
         os.makedirs(self.cleaned_dir, exist_ok=True)
@@ -76,26 +79,23 @@ class FontStyleProcessor:
             yaml.dump(cfg, f, allow_unicode=True)
 
     def run_inference(self):
-        inference_main(self.yaml_path, self.checkpoint, self.save_dir)
+        inference_main(self.yaml_path)
 
-    def generate_sample_image(self):
-        sample_text = '가'
-        self.generate_yaml(sample_text)
-        self.run_inference()
-        output_images = [f for f in os.listdir(self.save_dir) if f.endswith('.png')]
-        sentence_img = os.path.join(self.save_dir, 'sentence.png')
-        if output_images and os.path.exists(sentence_img):
-            sample_image_path = os.path.join(self.save_dir, 'sample.png')
-            Image.open(sentence_img).save(sample_image_path)
-            print(f"[SAVE] Sample image saved to {sample_image_path}")
-        else:
-            print("[WARN] Sample image 생성 실패 - sentence.png 또는 이미지 없음")
-
-    def run_all(self, target_chars):
+    def run_all(self, test_char):
+        print(f"[PROCESS] {self.pdf_path}")
         self.convert_pdf_to_images()
         self.trim_and_save_images()
         self.clean_images()
-        self.generate_yaml(target_chars)
+        self.generate_yaml(test_char)
         self.run_inference()
-        # 기본 sample.png 생성 추가
-        self.generate_sample_image()
+
+    def generate_sample_image(self):
+        sample_src = f"{self.output_dir}/sample.png"
+        sample_dst = f"{self.save_dir}/sample.png"
+        if os.path.exists(sample_src):
+            os.makedirs(self.save_dir, exist_ok=True)
+            import shutil
+            shutil.copyfile(sample_src, sample_dst)
+            print("[INFO] sample.png copied")
+        else:
+            print("[WARN] sample.png 없음")
