@@ -56,7 +56,7 @@
 
       if (data.images) {
         const content = `
-          <p class="text-sm font-semibold mb-1">예시 ${selectedIndex}</p>
+          <p class="text-sm font-semibold mb-1">글씨체 ${selectedIndex} 선택됨됨</p>
           <img src="${data.images[1]}" class="rounded shadow w-48 mt-1" />
           <a href="${data.images[1]}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
         `;
@@ -127,9 +127,9 @@
     <div id="examples-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {% for example in examples %}
       <div onclick="selectTemplate('{{ example.id }}')" class="cursor-pointer hover:scale-105 transition">
-        <img src="{{ url_for('static', filename=example.image) }}?t={{ rand_num }}" alt="예시 {{ loop.index }}"
+        <img src="{{ url_for('static', filename=example.image) }}?t={{ rand_num }}" alt="글씨체 {{ loop.index }}"
           class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
-        <p class="text-center text-sm mt-1">예시 {{ loop.index }}</p>
+        <p class="text-center text-sm mt-1">글씨체 {{ loop.index }}</p>
       </div>
       {% endfor %}
     </div>
