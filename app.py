@@ -57,14 +57,28 @@ def upload():
     if style_id == DEFAULT_STYLE_ID:
         return jsonify({'error': '기본 스타일 이름(Styleimg)으로는 업로드할 수 없습니다.'}), 400
 
+    session_id = session['id']
+    if style_id in session_fonts.get(session_id, []):
+        return jsonify({'error': '이미 등록된 스타일입니다.'}), 400
+
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
     processor = FontStyleProcessor(filepath)
     processor.run_all('가')
 
-    session_fonts[session['id']].append(style_id)
-    return jsonify({'status': 'success'})
+    session_fonts[session_id].append(style_id)
+
+    # 업로드 후 클라이언트에 새 예시 HTML 반환 (sample.png 포함)
+    example_html = f'''
+    <div onclick="selectTemplate('{style_id}')" class="cursor-pointer hover:scale-105 transition">
+        <img src="/static/outputs/{style_id}/sample.png?t={uuid.uuid4().hex}" alt="예시"
+            class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
+        <p class="text-center text-sm mt-1">예시 {len(session_fonts[session_id])}</p>
+    </div>
+    '''
+
+    return jsonify({'status': 'success', 'example_html': example_html})
 
 
 @app.route('/generate', methods=['POST'])
