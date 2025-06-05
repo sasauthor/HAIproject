@@ -60,10 +60,13 @@ def upload():
     file.save(filepath)
 
     processor = FontStyleProcessor(filepath)
-    processor.run_all('가')
+    processor.run_all('가')  # sample.png 포함 생성
 
     session_fonts[session['id']].append(style_id)
-    return jsonify({'status': 'success'})
+
+    # 썸네일 HTML 반환 추가
+    example_html = render_template("_example_item.html", fid=style_id, rand_num=random.random(), idx=len(session_fonts[session['id']]))
+    return jsonify({'status': 'success', 'example_html': example_html})
 
 @app.route('/generate', methods=['POST'])
 def generate():
