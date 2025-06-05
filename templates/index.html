@@ -1,33 +1,15 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HAI! 손글씨 AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    let selectedTemplateId = "";
-
     function selectTemplate(id) {
-      selectedTemplateId = id;
       document.getElementById("selected-style-id").value = id;
       console.log("선택된 템플릿 ID:", id);
-
-      // 기존 선택 해제
-      document.querySelectorAll("#examples-grid > div").forEach(div => {
-        div.classList.remove("selected-template");
-        div.querySelector("img").classList.remove("border-blue-500");
-      });
-
-      // 선택된 항목에 테두리 추가
-      const selectedDiv = [...document.querySelectorAll("#examples-grid > div")]
-        .find(div => div.getAttribute("onclick") === `selectTemplate('${id}')`);
-
-      if (selectedDiv) {
-        selectedDiv.classList.add("selected-template");
-        selectedDiv.querySelector("img").classList.add("border-blue-500");
-      }
     }
 
     async function handleSubmit(event) {
@@ -41,7 +23,6 @@
       }
 
       const chat = document.getElementById("chat-history");
-
       chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end">${input}</div>`;
 
       const loaderId = "loading-msg-" + Date.now();
@@ -65,7 +46,6 @@
             <img src="${url}" class="rounded shadow w-48" />
             <a href="${url}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
           </div>`).join('');
-
         chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${images}</div>`;
       } else {
         chat.innerHTML += `<div class="bg-red-100 p-2 my-2 rounded shadow w-fit">⚠️ 오류가 발생했어요!</div>`;
@@ -92,20 +72,7 @@
         document.getElementById("examples-grid").innerHTML += data.example_html;
       }
     }
-
-    // 초기 페이지 로드 시 선택된 스타일이 있으면 테두리 표시
-    window.addEventListener("DOMContentLoaded", () => {
-      const initialId = document.getElementById("selected-style-id").value;
-      if (initialId) {
-        selectTemplate(initialId);
-      }
-    });
   </script>
-  <style>
-    .selected-template img {
-      border-width: 2px !important;
-    }
-  </style>
 </head>
 
 <body class="bg-gray-100">
@@ -120,8 +87,8 @@
       <p>그러면 HAI가 예쁜 손글씨로 쓰여진 문구를 보내드립니다!</p>
       <div class="mt-4">
         <a href="{{ url_for('static', filename='28_template.pdf') }}"
-          class="bg-white border border-blue-500 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 shadow inline-block text-sm"
-          download>
+           class="bg-white border border-blue-500 text-blue-600 px-3 py-1 rounded hover:bg-blue-50 shadow inline-block text-sm"
+           download>
           📄 손글씨 템플릿 다운로드
         </a>
       </div>
@@ -154,5 +121,4 @@
     </div>
   </div>
 </body>
-
 </html>
