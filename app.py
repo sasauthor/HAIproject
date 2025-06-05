@@ -47,10 +47,11 @@ def load_session_fonts():
 @app.route('/')
 def index():
     session_id = session['id']
-    examples = [{'id': fid, 'image': f'{fid}/sample.png'} for fid in session_fonts[session_id]]
+    examples = [{'id': fid, 'image': f'outputs/{fid}/sample.png'} for fid in session_fonts[session_id]]
     selected_style = session_fonts[session_id][0]
     rand_num = random.random()
     return render_template('index.html', examples=examples, selected_style=selected_style, rand_num=rand_num)
+
 
 @app.route('/upload', methods=['POST'])
 def upload():
