@@ -1,4 +1,3 @@
-# style/crop.py (수정 버전)
 import os
 from PIL import Image, ImageChops, ImageOps
 import argparse
@@ -8,7 +7,6 @@ parser.add_argument("--src_dir", required=True)
 parser.add_argument("--dst_dir", required=True)
 args = parser.parse_args()
 
-# 디폴트 레이아웃 (모든 이미지에 적용)
 DEFAULT_ROWS, DEFAULT_COLS = 4, 7
 pad = 20
 os.makedirs(args.dst_dir, exist_ok=True)
@@ -27,7 +25,7 @@ for fname in sorted(os.listdir(args.src_dir)):
     cell_w = w // DEFAULT_COLS
     cell_h = h // DEFAULT_ROWS
 
-    index = 1  # 1부터 시작
+    index = 1
 
     for r in range(DEFAULT_ROWS):
         for c in range(DEFAULT_COLS):
@@ -47,14 +45,12 @@ for fname in sorted(os.listdir(args.src_dir)):
             padding = 30
             cropped = ImageOps.expand(cropped, border=padding, fill=255)
 
-            # 정사각형 배경 만들고 중앙 배치
             max_side = max(cropped.size)
             square = Image.new("L", (max_side, max_side), 255)
             offset = ((max_side - cropped.width) // 2, (max_side - cropped.height) // 2)
             square.paste(cropped, offset)
             cropped = square
 
-            # 최종 리사이즈
             cropped = cropped.resize((512, 512), Image.BICUBIC)
 
             fname_out = f"uni{start_unicode + count:04X}.png"
