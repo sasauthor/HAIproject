@@ -9,6 +9,13 @@
   <script>
     function selectTemplate(id) {
       document.getElementById("selected-style-id").value = id;
+      document.querySelectorAll("[id^='style-thumb-']").forEach(el => {
+        el.classList.remove("border-blue-500", "ring-2", "ring-blue-300");
+      });
+      const target = document.getElementById(`style-thumb-${id}`);
+      if (target) {
+        target.classList.add("border-blue-500", "ring-2", "ring-blue-300");
+      }
       console.log("선택된 템플릿 ID:", id);
     }
 
@@ -69,7 +76,7 @@
 
       const data = await res.json();
       if (data.example_html) {
-        document.getElementById("examples-grid").innerHTML += data.example_html;
+        document.getElementById("examples-grid").insertAdjacentHTML("beforeend", data.example_html);
       }
     }
   </script>
@@ -120,5 +127,14 @@
       {% endfor %}
     </div>
   </div>
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const initialId = document.getElementById("selected-style-id").value;
+  const initialThumb = document.getElementById(`style-thumb-${initialId}`);
+  if (initialThumb) {
+    initialThumb.classList.add("border-blue-500", "ring-2", "ring-blue-300");
+  }
+});
+</script>
 </body>
 </html>
