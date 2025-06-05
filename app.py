@@ -7,6 +7,11 @@ import random
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'hai-secret-key'
+
+# 세션 설정
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_PERMANENT'] = False  # 브라우저 종료 시 세션 만료
+app.config['SESSION_REFRESH_EACH_REQUEST'] = False  # 요청마다 세션 갱신 안 함
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -35,6 +40,8 @@ def load_session_fonts():
         session['id'] = session_id
     if session_id not in session_fonts:
         session_fonts[session_id] = [DEFAULT_STYLE_ID]
+
+Session(app)
 
 @app.route('/')
 def index():
