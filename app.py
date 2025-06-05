@@ -52,15 +52,20 @@ def upload():
         return jsonify({'error': 'PDF 파일만 업로드 가능합니다.'}), 400
 
     filename = secure_filename(file.filename)
+    style_id = os.path.splitext(filename)[0]
+
+    if style_id == DEFAULT_STYLE_ID:
+        return jsonify({'error': '기본 스타일 이름(Styleimg)으로는 업로드할 수 없습니다.'}), 400
+
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
-    style_id = os.path.splitext(filename)[0]
     processor = FontStyleProcessor(filepath)
     processor.run_all('가')
 
     session_fonts[session['id']].append(style_id)
     return jsonify({'status': 'success'})
+
 
 @app.route('/generate', methods=['POST'])
 def generate():
