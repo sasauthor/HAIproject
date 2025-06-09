@@ -74,7 +74,13 @@ def upload():
     session_fonts[session['id']].append(style_id)
 
     # 썸네일 HTML 반환 추가
-    example_html = render_template("_example_item.html", fid=style_id, rand_num=random.random(), idx=len(session_fonts[session['id']]))
+    example_html = render_template(
+        "_example_item.html",
+        fid=style_id,
+        rand_num=random.random(),
+        idx=len(session_fonts[session['id']])
+    )
+
     return jsonify({'status': 'success', 'example_html': example_html})
 
 @app.route('/generate', methods=['POST'])
