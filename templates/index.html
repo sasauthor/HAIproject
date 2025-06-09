@@ -125,7 +125,7 @@
     <h2 class="text-xl font-semibold mt-8 mb-4">저장된 글씨체 예시</h2>
     <div id="examples-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {% for example in examples %}
-      <div onclick="selectTemplate('{{ example.id }}', '{{ loop.index }}')" class="cursor-pointer hover:scale-105 transition">
+      <div onclick="selectTemplate('{{ example.id }}', {{ loop.index }})" class="cursor-pointer hover:scale-105 transition">
         <img id="style-thumb-{{ example.id }}"
              src="{{ url_for('static', filename=example.image) }}?t={{ rand_num }}" alt="예시 {{ loop.index }}"
              class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
