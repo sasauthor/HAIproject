@@ -5,6 +5,13 @@
 shit+enter를 누르면 문구 입력창 내에서 줄바꿈이 되도록 수정하였습니다.
 ![스크린샷 2025-06-13 035047](https://github.com/user-attachments/assets/eadc01ce-2b75-4e73-8718-b92c24118e2c)
 
+---
+"필독"
+---
+자음 하나, 모음 하나와 같이 한글자 미만을 입력하면 작동이 되지 않습니다.
+한 글자 이상을 입력해주세요.
+한글만 됩니다.
+Sorry for other language users, It's only for Korean.
 
 ---
 사용방법
