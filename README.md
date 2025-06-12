@@ -50,6 +50,6 @@ sudo apt-get install -y poppler-utils
 ![HAI! 손글씨 AI의 사본 (12)](https://github.com/user-attachments/assets/f91c08de-52f7-473a-b36f-b136a8843378)
 
 진행 과정에 있어 사전 모델을 위해 colab을 활용했습니다.
-해당 코드 또한 ipynb파일로 첨부합니다.
+해당 코드 또한 ipynb파일로 첨부합니다.(HAIproject.ipynb)
 
 
