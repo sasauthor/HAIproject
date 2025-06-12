@@ -149,7 +149,7 @@ def save_sentence_image(
     img_idx = 0
 
     for c in text:
-        if c == '\\n':
+        if c == '\n':
             y_offset += target_height + line_spacing
             x_offset = 0
         elif c == ' ':
