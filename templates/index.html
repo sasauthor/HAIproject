@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -8,26 +7,26 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     let selectedIndex = 1;
+
     function selectTemplate(id, idx) {
       document.getElementById("selected-style-id").value = id;
 
       const thumbs = document.querySelectorAll("[id^='style-thumb-']");
       thumbs.forEach(el => el.classList.remove("border-blue-500", "ring-2", "ring-blue-300"));
-    
+
       const target = document.getElementById(`style-thumb-${id}`);
       if (target) {
         target.classList.add("border-blue-500", "ring-2", "ring-blue-300");
       }
-    
+
       selectedIndex = idx;
-    
       console.log("선택된 템플릿 ID:", id, "예시", selectedIndex,"선택됨.");
     }
 
-
     async function handleSubmit(event) {
       event.preventDefault();
-      const input = document.getElementById("text-input").value.trim();
+      const textarea = document.getElementById("text-input");
+      const input = textarea.value.trim();
       const styleId = document.getElementById("selected-style-id").value;
 
       if (!input || !styleId) {
@@ -36,7 +35,7 @@
       }
 
       const chat = document.getElementById("chat-history");
-      chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end">${input}</div>`;
+      chat.innerHTML += `<div class="bg-white p-2 my-2 rounded shadow w-fit self-end whitespace-pre-wrap">${input}</div>`;
 
       const loaderId = "loading-msg-" + Date.now();
       chat.innerHTML += `<div id="${loaderId}" class="bg-gray-200 p-2 my-2 rounded shadow w-fit italic text-gray-600">[...] 이미지 생성 중...</div>`;
@@ -59,12 +58,11 @@
           <img src="${data.images[1]}" class="rounded shadow w-48 mt-1" />
           <a href="${data.images[1]}" download class="text-blue-600 underline text-sm block mt-1">🔗 다운로드</a>
         `;
-        
         chat.innerHTML += `<div class="bg-blue-100 p-2 my-2 rounded shadow w-fit">${content}</div>`;
-
       }
 
-      document.getElementById("text-input").value = "";
+      textarea.value = "";
+      autoResize(textarea);  // 높이 초기화
       chat.scrollTop = chat.scrollHeight;
     }
 
@@ -85,6 +83,26 @@
         document.getElementById("examples-grid").insertAdjacentHTML("beforeend", data.example_html);
       }
     }
+
+    function autoResize(textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        document.querySelector("form").dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const initialId = document.getElementById("selected-style-id").value;
+      const initialThumb = document.getElementById(`style-thumb-${initialId}`);
+      if (initialThumb) {
+        initialThumb.classList.add("border-blue-500", "ring-2", "ring-blue-300");
+      }
+    });
   </script>
 </head>
 
@@ -109,16 +127,20 @@
 
     <div id="chat-history" class="flex flex-col bg-white h-[450px] overflow-y-scroll p-4 rounded shadow mb-4"></div>
 
-    <form class="flex items-center space-x-2" onsubmit="handleSubmit(event)">
+    <form class="flex items-end space-x-2" onsubmit="handleSubmit(event)">
       <label for="file-upload" class="cursor-pointer">
         <span class="text-2xl">➕</span>
       </label>
       <input id="file-upload" type="file" class="hidden" name="file" onchange="uploadFile(event)" />
-      <input id="text-input" type="text" name="text" placeholder="문구 입력칸"
-        class="flex-grow border border-gray-300 rounded px-4 py-2" />
+
+      <textarea id="text-input" name="text" placeholder="문구 입력칸"
+        class="flex-grow border border-gray-300 rounded px-4 py-2 resize-none overflow-hidden leading-relaxed max-h-48"
+        rows="1" oninput="autoResize(this)" onkeydown="handleKeyPress(event)"></textarea>
+
       <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
         <span class="text-xl">⬆️</span>
       </button>
+
       <input type="hidden" id="selected-style-id" value="{{ selected_style }}">
     </form>
 
@@ -129,20 +151,10 @@
         <img id="style-thumb-{{ example.id }}"
              src="{{ url_for('static', filename=example.image) }}?t={{ rand_num }}" alt="예시 {{ loop.index }}"
              class="rounded-lg shadow border-2 border-transparent hover:border-blue-400" />
-
         <p class="text-center text-sm mt-1">예시 {{ loop.index }}</p>
       </div>
       {% endfor %}
     </div>
   </div>
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  const initialId = document.getElementById("selected-style-id").value;
-  const initialThumb = document.getElementById(`style-thumb-${initialId}`);
-  if (initialThumb) {
-    initialThumb.classList.add("border-blue-500", "ring-2", "ring-blue-300");
-  }
-});
-</script>
 </body>
 </html>
