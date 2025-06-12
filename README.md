@@ -1,19 +1,19 @@
 ---
 최근 업데이트 내역
 ---
-2025.06.13
+2025.06.13\n
 shit+enter를 누르면 문구 입력창 내에서 줄바꿈이 되도록 수정하였습니다.
 ![스크린샷 2025-06-13 035047](https://github.com/user-attachments/assets/eadc01ce-2b75-4e73-8718-b92c24118e2c)
 
 ---
 "필독"
 ---
-자음 하나, 모음 하나와 같이 한글자 미만을 입력하면 작동이 되지 않습니다.
-한 글자 이상을 입력해주세요.
-한글만 됩니다.
-Sorry for other language users, It's only for Korean.
-다운로드 링크는 가장 최신으로 생성된 이미지를 제공합니다.
-이전에 생성한 이미지는 복사/붙여넣기 기능을 활용해 주세요.
+자음 하나, 모음 하나와 같이 한글자 미만을 입력하면 작동이 되지 않습니다.\n
+한 글자 이상을 입력해주세요.\n
+한글만 됩니다.\n
+Sorry for other language users, It's only for Korean.\n
+다운로드 링크는 가장 최신으로 생성된 이미지를 제공합니다.\n
+이전에 생성한 이미지는 복사/붙여넣기 기능을 활용해 주세요.\n
 (또한 다운로드 링크에 세션간 충돌의 가능성 또한 있습니다.)
 
 ---
@@ -30,8 +30,8 @@ gdown 1ZYRKiuIAB_Olxbu5xz5XnaUNXQycYzX_ -O checkpoints/korean-handwriting.pth
 ```
 python app.py
 ```
-로 실행해주세요.
-만약 실행하는 환경에 Poppler가 없다면 Poppler를 설치하셔야 합니다.
+로 실행해주세요.\n
+만약 실행하는 환경에 Poppler가 없다면 Poppler를 설치하셔야 합니다.\n
 ubuntu/debian 계열에선 아래 명령어를 실행해주세요.
 ```
 sudo apt-get update
@@ -41,8 +41,8 @@ sudo apt-get install -y poppler-utils
 ---
 프로젝트 개요
 ---
-본 프로젝트는 세종과학예술영재학교의 2025학년도 인공지능 프로젝트 수행평가로 진행되었습니다.
-또한 본 프로젝트는 DM-Font 모델을 활용하였음을 알립니다.
+본 프로젝트는 세종과학예술영재학교의 2025학년도 인공지능 프로젝트 수행평가로 진행되었습니다.\n
+또한 본 프로젝트는 DM-Font 모델을 활용하였음을 알립니다.\n
 (https://github.com/clovaai/dmfont)
 
 ![HAI! 손글씨 AI의 사본](https://github.com/user-attachments/assets/339b9f0b-a6e9-4628-996e-04d8745e68de)
