@@ -127,7 +127,7 @@ def save_sentence_image(
     img_idx = 0
     line_count = 1
     for c in text:
-        if c == '\\n':
+        if c == '\n':
             max_line_width = max(max_line_width, line_width)
             line_width = 0
             line_count += 1
